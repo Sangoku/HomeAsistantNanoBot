@@ -18,6 +18,8 @@ ports_description:
 map:
   - type: data
     read_only: false
+  - type: config
+    read_only: false
 options:
   llm_provider: "custom"
   llm_api_key: ""

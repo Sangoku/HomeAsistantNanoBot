@@ -30,7 +30,9 @@ def env_or(env_key: str, fallback):
 
 def main():
     options_path = Path("/data/options.json")
-    config_dir = Path.home() / ".nanobot"
+    # /config/nanobot is accessible from HA's File Editor / Studio Code Server
+    # and is bind-mounted to dev/nanobot-workspace/ in dev mode.
+    config_dir = Path("/config/nanobot")
     config_path = config_dir / "config.json"
 
     # Load options.json (may contain placeholder values)

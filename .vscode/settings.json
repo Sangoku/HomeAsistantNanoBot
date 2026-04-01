@@ -1,0 +1,16 @@
+{
+  "files.associations": {
+    "dev/nanobot-workspace/**/*.md": "markdown"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true
+  },
+  "markdown.preview.openMarkdownLinks": "inPreview"
+}

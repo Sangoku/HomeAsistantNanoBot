@@ -45,6 +45,11 @@ services:
       - ./options.json:/data/options.json:ro
       # Persistent nanobot data (config, workspace, memory)
       - nanobot_data:/data/nanobot
+      # NanoBot /config/nanobot — bind-mounted to dev/nanobot-workspace/ on the host.
+      # This mirrors the real HA /config/nanobot path so you can edit files from VS Code
+      # (or any HA file editor) and see them live inside the container.
+      # Contains: config.json (generated on startup) + workspace/ (AI markdown files)
+      - ./nanobot-workspace:/config/nanobot
       # Live-edit addon scripts without rebuilding the image
       - ../nanobot/run.sh:/run.sh:ro
       - ../nanobot/generate_config.py:/app/generate_config.py:ro

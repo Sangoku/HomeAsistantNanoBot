@@ -27,6 +27,10 @@ Thumbs.db
 dev/.storage/
 dev/config/
 
+# NanoBot workspace — keep the dir + README, ignore runtime files
+dev/nanobot-workspace/*
+!dev/nanobot-workspace/README.md
+
 # Secrets (never commit)
 *.env
 .env.local
