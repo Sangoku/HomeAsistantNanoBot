@@ -1,0 +1,42 @@
+name: "NanoBot AI Assistant"
+version: "0.1.4"
+slug: "nanobot"
+description: >-
+  Ultra-lightweight personal AI assistant powered by NanoBot.
+  Supports multiple LLM providers and Discord integration.
+url: "https://github.com/HKUDS/nanobot"
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+init: false
+ports:
+  18790/tcp: 18790
+ports_description:
+  18790/tcp: "NanoBot Gateway API"
+map:
+  - type: data
+    read_only: false
+options:
+  llm_provider: "custom"
+  llm_api_key: ""
+  llm_base_url: ""
+  llm_model: "claude-4.5"
+  discord_enabled: false
+  discord_bot_token: ""
+  discord_channel_id: ""
+  discord_allowed_users: "*"
+  discord_group_policy: "open"
+  log_level: "info"
+schema:
+  llm_provider: "str"
+  llm_api_key: "password"
+  llm_base_url: "url?"
+  llm_model: "str"
+  discord_enabled: "bool"
+  discord_bot_token: "password?"
+  discord_channel_id: "str?"
+  discord_allowed_users: "str?"
+  discord_group_policy: "list(open|mention)?"
+  log_level: "list(trace|debug|info|warning|error)"

@@ -1,0 +1,54 @@
+name: nanobot-dev
+
+# Local dev environment for nanobot addon testing
+# Simulates the HA addon environment without a real Home Assistant Supervisor.
+#
+# Usage:
+#   cd dev/
+#   cp .env.example .env
+#   # Edit .env with your real credentials
+#   docker compose up --build
+#
+# NanoBot has NO web GUI — it's a headless AI agent.
+# Interact with it via Discord (channel configured in dev/.env).
+# Port 18790 is the internal WhatsApp bridge WebSocket (not a web UI).
+
+services:
+
+  # ── NanoBot addon container ─────────────────────────────────────────────────
+  nanobot:
+    container_name: nanobot-dev-addon
+    build:
+      context: ../nanobot
+      dockerfile: Dockerfile
+      args:
+        BUILD_FROM: ghcr.io/home-assistant/aarch64-base-python:3.12-alpine3.21
+        BUILD_ARCH: aarch64
+        BUILD_VERSION: "dev"
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+      # Dummy supervisor token — run.sh handles missing bashio gracefully
+      SUPERVISOR_TOKEN: "dev-token"
+      # Credentials from dev/.env (gitignored) — override options.json values
+      NANOBOT_LLM_PROVIDER: ${LLM_PROVIDER:-custom}
+      NANOBOT_LLM_API_KEY: ${LLM_API_KEY:-}
+      NANOBOT_LLM_BASE_URL: ${LLM_BASE_URL:-}
+      NANOBOT_LLM_MODEL: ${LLM_MODEL:-claude-4.5}
+      NANOBOT_DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      NANOBOT_DISCORD_CHANNEL_ID: ${DISCORD_CHANNEL_ID:-}
+      NANOBOT_DISCORD_ALLOWED_USERS: ${DISCORD_ALLOWED_USERS:-*}
+      NANOBOT_DISCORD_GROUP_POLICY: ${DISCORD_GROUP_POLICY:-open}
+    ports:
+      - "18790:18790"   # NanoBot WhatsApp bridge WebSocket (internal)
+    volumes:
+      # Mock HA Supervisor options.json — template only, env vars take precedence
+      - ./options.json:/data/options.json:ro
+      # Persistent nanobot data (config, workspace, memory)
+      - nanobot_data:/data/nanobot
+      # Live-edit addon scripts without rebuilding the image
+      - ../nanobot/run.sh:/run.sh:ro
+      - ../nanobot/generate_config.py:/app/generate_config.py:ro
+    restart: unless-stopped
+
+volumes:
+  nanobot_data:

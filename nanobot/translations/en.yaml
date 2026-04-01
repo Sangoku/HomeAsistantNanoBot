@@ -1,0 +1,36 @@
+configuration:
+  llm_provider:
+    name: LLM Provider
+    description: >-
+      The LLM provider to use. Set to "custom" for any OpenAI-compatible endpoint,
+      or use a specific provider name like "openai", "anthropic", "openrouter", etc.
+  llm_api_key:
+    name: LLM API Key
+    description: >-
+      API key for the LLM provider. Required for most providers.
+  llm_base_url:
+    name: LLM Base URL
+    description: >-
+      Base URL for the LLM API endpoint. Required for custom providers.
+      Example: https://api.openai.com/v1
+  llm_model:
+    name: LLM Model
+    description: >-
+      The model to use for the AI assistant.
+      Example: claude-4.5, gpt-4o, deepseek-chat
+  discord_enabled:
+    name: Enable Discord
+    description: >-
+      Enable the Discord bot channel for NanoBot.
+  discord_bot_token:
+    name: Discord Bot Token
+    description: >-
+      The Discord bot token. Create a bot at https://discord.com/developers/applications
+  discord_channel_id:
+    name: Discord Channel ID
+    description: >-
+      The Discord channel ID to restrict the bot to. Leave empty to allow all channels.
+  log_level:
+    name: Log Level
+    description: >-
+      The log level for NanoBot. Use "debug" for troubleshooting.

@@ -1,0 +1,33 @@
+# NanoBot reference checkout (large, not part of the add-on)
+nanobot-ref/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Dev environment generated files
+dev/.storage/
+dev/config/
+
+# Secrets (never commit)
+*.env
+.env.local
+dev/options.json

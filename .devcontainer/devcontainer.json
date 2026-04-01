@@ -1,0 +1,34 @@
+{
+  "name": "NanoBot HA Add-on Development",
+  "image": "ghcr.io/home-assistant/devcontainer:2-apps",
+  "appPort": ["7123:8123", "18790:18790"],
+  "postStartCommand": "bash devcontainer_bootstrap",
+  "runArgs": ["-e", "GIT_EDITOR=code --wait", "--privileged"],
+  "workspaceFolder": "/mnt/supervisor/addons/local/nanobot",
+  "workspaceMount": "source=${localWorkspaceFolder}/nanobot,target=/mnt/supervisor/addons/local/nanobot,type=bind,consistency=cached",
+  "containerEnv": {
+    "WORKSPACE_DIRECTORY": "/mnt/supervisor/addons/local/nanobot"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "timonwong.shellcheck",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": { "path": "/usr/bin/zsh" }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true
+      }
+    }
+  },
+  "mounts": [
+    "type=volume,target=/var/lib/docker",
+    "type=volume,target=/mnt/supervisor"
+  ]
+}
