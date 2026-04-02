@@ -17,7 +17,8 @@ RUN apk add --no-cache \
     openssl-dev \
     cargo \
     jq \
-    bash
+    bash \
+    nginx
 
 # Install nanobot-ai from PyPI with Discord + API server support
 RUN pip3 install --no-cache-dir --break-system-packages "nanobot-ai[discord]" aiohttp
@@ -29,6 +30,16 @@ RUN pip3 install --no-cache-dir --break-system-packages websockets paho-mqtt
 # Phase 5: nanobot-webui for web management panel
 # Use PyPI package - includes pre-built React frontend
 RUN pip3 install --no-cache-dir --break-system-packages nanobot-webui
+
+# Extract web UI static files to nginx directory
+RUN mkdir -p /usr/share/nginx/html && \
+    python3 -c "import webui.web; import os, shutil; src = os.path.join(os.path.dirname(webui.web.__file__), 'dist'); dst = '/usr/share/nginx/html'; [shutil.copytree(os.path.join(src, f), os.path.join(dst, f)) for f in os.listdir(src) if os.path.isdir(os.path.join(src, f))] if os.path.isdir(src) else None" || true
+
+# Copy nginx config for ingress
+COPY nginx.conf /etc/nginx/http.d/nanobot.conf
+
+# Create nginx run directory
+RUN mkdir -p /run/nginx
 
 # Create app directory
 WORKDIR /app
