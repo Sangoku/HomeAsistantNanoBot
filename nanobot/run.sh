@@ -213,24 +213,35 @@ fi
 if [ "${WEBUI_ENABLED}" = "true" ]; then
     echo "[INFO] NanoBot WebUI enabled..."
     
-    # Extract static files from webui package if not already done
-    if [ ! -d "/usr/share/nginx/html/assets" ]; then
-        echo "[INFO] Extracting WebUI static files..."
-        python3 -c "
+    # Extract static files from webui package at runtime
+    echo "[INFO] Extracting WebUI static files..."
+    mkdir -p /usr/share/nginx/html
+    python3 -c "
 import webui.web
 import os, shutil
 src = os.path.join(os.path.dirname(webui.web.__file__), 'dist')
 dst = '/usr/share/nginx/html'
+print(f'Source: {src}, exists: {os.path.isdir(src)}')
 if os.path.isdir(src):
     for f in os.listdir(src):
         src_path = os.path.join(src, f)
         dst_path = os.path.join(dst, f)
         if os.path.isdir(src_path):
             shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+            print(f'Copied dir: {f}')
         else:
             shutil.copy2(src_path, dst_path)
-print('Static files extracted')
-" || echo "[WARNING] Failed to extract static files"
+            print(f'Copied file: {f}')
+    print('Static files extracted successfully')
+else:
+    print('WARNING: src directory does not exist')
+" 2>&1
+    
+    # Verify files exist
+    ls -la /usr/share/nginx/html/ 2>&1 || echo "[ERROR] html directory empty"
+    
+    if [ ! -f "/usr/share/nginx/html/index.html" ]; then
+        echo "[ERROR] index.html not found!"
     fi
     
     # Start WebUI backend on port 18781 (nginx proxies 8099 -> 18781)
