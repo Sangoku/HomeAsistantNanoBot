@@ -1,186 +1,104 @@
 # NanoBot AI Assistant
 
-Ultra-lightweight personal AI assistant powered by [NanoBot](https://github.com/HKUDS/nanobot), deeply integrated with Home Assistant.
-
-## About
-
-NanoBot is an ultra-lightweight personal AI assistant with full tool-use capabilities. This add-on runs NanoBot inside Home Assistant and connects it to your smart home through multiple integration layers:
-
-- **Smart home awareness** — reads device states, history, automations, and more via 92 HA tools
-- **Smart home control** — calls HA services, controls devices, creates automations (opt-in)
-- **Voice assistant backend** — becomes the AI brain behind HA Assist / voice commands
-- **Reactive automation** — reacts to home events (motion, door open, state changes) in real-time
-- **MQTT bridge** — two-way communication with HA automations and IoT devices
-- **Proactive agent** — scheduled briefings, energy reports, security alerts
+Your personal AI brain for Home Assistant — ask questions, control devices, get briefings, all by voice, Discord, or MQTT.
 
 ---
 
-## Configuration
+## Getting Started
 
-### LLM Provider Settings
+### 1. Configure your LLM
 
-| Option | Description |
-|--------|-------------|
-| **LLM Provider** | Provider name: `custom` (any OpenAI-compat endpoint), `openai`, `anthropic`, `openrouter`, etc. |
-| **LLM API Key** | API key for the provider |
-| **LLM Base URL** | Base URL for the API (required for `custom`). Example: `https://api.openai.com/v1` |
-| **LLM Model** | Model name. Examples: `claude-4.5`, `gpt-4o`, `deepseek-chat` |
+NanoBot needs an LLM backend. Any OpenAI-compatible provider works.
 
-### Discord Integration
+| Option | Example |
+|---|---|
+| **LLM Provider** | `custom` |
+| **LLM API Key** | `sk-abc123...` |
+| **LLM Base URL** | `https://api.openai.com/v1` |
+| **LLM Model** | `gpt-4o`, `claude-4.5`, `deepseek-chat` |
 
-| Option | Description |
-|--------|-------------|
-| **Enable Discord** | Toggle Discord bot on/off |
-| **Discord Bot Token** | Bot token from https://discord.com/developers/applications |
-| **Discord Channel ID** | Restrict bot to a specific channel (optional) |
-| **Discord Allowed Users** | Comma-separated Discord user IDs, or `*` for all users |
-| **Discord Group Policy** | `open` = respond to all messages; `mention` = only when @mentioned |
+### 2. Connect to your smart home
 
-### Logging
+Install the [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) add-on, then:
 
-| Option | Description |
-|--------|-------------|
-| **Log Level** | `trace`, `debug`, `info` (default), `warning`, `error` |
+1. Start ha-mcp and copy the **MCP Server URL** from its logs
+2. In NanoBot settings, enable **Enable Home Assistant MCP**
+3. Paste the URL into **HA MCP Server URL**
+4. Leave **HA Read-Only Mode** enabled (recommended)
+
+NanoBot now has 38+ tools to query your entire smart home — states, history, areas, automations, devices, and more.
+
+### 3. Enable voice control (optional)
+
+1. Enable **Enable OpenAI-Compatible API**
+2. Enable **Auto-register as Conversation Agent**
+3. Restart the add-on
+
+NanoBot automatically registers itself as the conversation agent in HA Assist. No manual integration setup needed — just talk to your home.
 
 ---
 
-## Phase 1: Home Assistant MCP Integration
+## Capabilities
 
-NanoBot connects to your Home Assistant via the [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) add-on, giving it **92 tools** to read and control the entire smart home.
+### Smart Home Awareness
 
-### Setup
+With HA MCP connected, NanoBot can naturally answer questions about your home:
 
-1. **Install the ha-mcp add-on** from https://github.com/homeassistant-ai/ha-mcp and start it.
-2. Open the **ha-mcp add-on logs** and copy the MCP server URL (e.g., `http://homeassistant.local:8808/mcp`).
-3. In NanoBot's configuration:
-   - Set **Enable Home Assistant MCP** to `true`
-   - Paste the URL into **HA MCP Server URL**
-   - Leave **HA Long-Lived Access Token** blank (ha-mcp handles auth automatically when installed as a local add-on)
-   - Leave **HA Read-Only Mode** enabled (default, recommended) — NanoBot can read everything but cannot control devices
+> "What's the temperature in the living room?"
+>
+> "Which lights are on?"
+>
+> "Show me the energy usage for the last 24 hours"
+>
+> "Are there any pending updates?"
 
-### Read-Only vs Full Access
+### Smart Home Control
+
+Set **HA Read-Only Mode** to `false` to let NanoBot control your home:
+
+> "Turn off all lights in the bedroom"
+>
+> "Set the thermostat to 22 degrees"
+>
+> "Create an automation that turns on the porch light at sunset"
 
 | Mode | What NanoBot can do |
-|------|---------------------|
-| **Read-Only** (default, `ha_read_only: true`) | Read all entity states, search entities, view history, logbook, statistics, automations, dashboards. Cannot call services or change anything. |
-| **Full Access** (`ha_read_only: false`) | All 92 tools including `ha_call_service`, `ha_bulk_control`, `ha_config_set_automation`, `ha_backup_create`, etc. |
+|---|---|
+| **Read-Only** (default) | Read states, search entities, view history, logbook, statistics, automations, dashboards |
+| **Full Access** | Everything above, plus call services, control devices, create/modify automations |
 
-To grant full access, set **HA Read-Only Mode** to `false` in the add-on configuration.
+### Voice Assistant
 
-### Available Tools (sample)
+When enabled, NanoBot serves as the AI brain behind HA Assist. It handles voice commands with full smart home context through its MCP tools.
 
-Once connected, NanoBot can use these tools naturally in conversation:
+**Automatic setup:** Enable the API + auto conversation agent checkboxes. Done.
 
-```
-ha_get_overview         — get a full summary of your home
-ha_get_state            — get the state of any entity
-ha_search_entities      — find entities by name, area, or type
-ha_get_history          — get historical state data
-ha_call_service         — call any HA service (full-access only)
-ha_config_set_automation — create/modify automations (full-access only)
-```
+**Manual setup:** Add the `OpenAI Conversation` integration in HA, point it at `http://<ha-ip>:8900/v1` with any API key.
 
-### Example Conversations
+### Discord Bot
 
-> "What lights are on in the living room?"  
-> "Turn off all lights in the bedroom" (requires full access)  
-> "Show me the temperature trend in the kitchen over the last 24 hours"  
-> "Create an automation that turns off the living room lights at midnight"
+Enable Discord to chat with your smart home from anywhere:
 
----
+| Option | Description |
+|---|---|
+| **Discord Bot Token** | From [Discord Developer Portal](https://discord.com/developers/applications) |
+| **Discord Channel ID** | Restrict to a channel (leave empty for all) |
+| **Discord Allowed Users** | Comma-separated user IDs, or `*` for all |
+| **Discord Group Policy** | `open` = all messages, `mention` = only @mentions |
 
-## Phase 2: Voice Assistant / HA Conversation Integration
+### MQTT Bridge
 
-NanoBot can become the AI brain behind HA Assist — handling voice commands with full smart home context.
+Enable MQTT for two-way communication with HA automations and IoT devices.
 
-### Automatic Setup (Recommended)
-
-1. Set **Enable OpenAI-Compatible API** to `true`.
-2. Set **Auto-register as Conversation Agent** to `true`.
-3. Restart the add-on.
-
-NanoBot will automatically:
-- Create an OpenAI Conversation integration entry in HA pointing at `http://localhost:8900/v1`
-- Set NanoBot as the conversation agent in your default Assist pipeline
-
-No manual configuration in HA is needed. NanoBot registers itself on every startup (idempotent — skips if already configured).
-
-### Manual Setup
-
-If you prefer to configure it manually, or if auto-registration isn't available:
-
-1. Set **Enable OpenAI-Compatible API** to `true` in the NanoBot add-on configuration.
-2. In Home Assistant, go to **Settings -> Devices & Services -> Add Integration**.
-3. Search for **OpenAI Conversation** and add it.
-4. Configure it with:
-   - **API Key**: any non-empty string (e.g., `nanobot`)
-   - **Base URL**: `http://<your-ha-ip>:8900/v1`
-5. Go to **Settings -> Voice Assistants**, create or edit a voice assistant, and set **Conversation agent** to the NanoBot OpenAI integration.
-
-NanoBot will now handle all voice and Assist queries with full HA context via its MCP tools.
-
----
-
-## Phase 3: HA Event Streaming
-
-NanoBot can react to real-time Home Assistant events: motion detected, doors opened, lights changed, automations triggered, and more.
-
-### Setup
-
-1. Set **Enable HA Event Streaming** to `true`.
-2. Optionally configure **HA Event Types** (comma-separated). Default: `state_changed`.
-   - Examples: `state_changed,automation_triggered,call_service`
-3. Restart the add-on.
-
-### How It Works
-
-NanoBot's event listener connects to HA's WebSocket API and writes event files to:
-
-```
-/config/nanobot/workspace/events/<timestamp>-<event_type>.json
-```
-
-NanoBot's proactive agent (see Phase 5) watches this directory and reacts according to the instruction files in `/config/nanobot/workspace/instructions/`.
-
-### Event File Format
-
-```json
-{
-  "timestamp": "2025-04-01T22:05:33+00:00",
-  "event_type": "state_changed",
-  "summary": "binary_sensor.hallway_motion: off → on",
-  "data": {
-    "entity_id": "binary_sensor.hallway_motion",
-    "new_state": { "state": "on", ... },
-    "old_state": { "state": "off", ... }
-  }
-}
-```
-
----
-
-## Phase 4: MQTT Bidirectional Channel
-
-NanoBot can communicate with HA automations and IoT devices over MQTT.
-
-### Requirements
-
-- The **Mosquitto broker** add-on must be installed and running.
-- **Enable OpenAI-Compatible API** (`api_enabled`) must be `true` — the MQTT bridge forwards incoming messages to NanoBot's API server on port 8900.
-- Set **Enable MQTT Integration** to `true` in NanoBot configuration.
-- NanoBot will auto-detect the Mosquitto broker via HA service discovery.
-
-### MQTT Topics
+**Prerequisites:** Mosquitto broker add-on + **Enable OpenAI-Compatible API** must both be active.
 
 | Topic | Direction | Description |
-|-------|-----------|-------------|
-| `nanobot/inbox` | HA → NanoBot | Send a task to NanoBot. Payload: plain text or `{"task": "..."}` |
-| `nanobot/outbox` | NanoBot → HA | NanoBot publishes responses/results here |
-| `nanobot/status` | NanoBot → HA | `online` when running, `offline` when stopped (retained) |
+|---|---|---|
+| `nanobot/inbox` | HA -> NanoBot | Send a task. Payload: plain text or `{"task": "..."}` |
+| `nanobot/outbox` | NanoBot -> HA | Responses published here automatically |
+| `nanobot/status` | NanoBot -> HA | `online` / `offline` (retained) |
 
-### HA Automation Examples
-
-**Send a task to NanoBot:**
+**Send a task from an automation:**
 ```yaml
 service: mqtt.publish
 data:
@@ -188,7 +106,7 @@ data:
   payload: "What lights are on right now?"
 ```
 
-**React to a NanoBot response:**
+**React to NanoBot's response:**
 ```yaml
 trigger:
   - platform: mqtt
@@ -199,63 +117,29 @@ action:
       message: "{{ trigger.payload }}"
 ```
 
-**NanoBot publishes to custom topic from workspace:**
+### Event Reactions
 
-NanoBot can publish to any MQTT topic by writing a JSON file to `/config/nanobot/workspace/mqtt_publish/`:
-```json
-{
-  "topic": "home/nanobot/alert",
-  "payload": "Motion detected in hallway at 2:34 AM",
-  "retain": false
-}
-```
+Enable **HA Event Streaming** to make NanoBot react to real-time home events.
 
----
+Events are written to `/config/nanobot/workspace/events/` as JSON files. NanoBot's proactive agent watches this directory and acts based on your instruction files.
 
-## Phase 5: Proactive Cron Agent
+**Configure:** Set **HA Event Types** to a comma-separated list (default: `state_changed`).
 
-NanoBot can autonomously perform scheduled tasks and react to events using instruction files in the workspace.
+### Proactive Agent
 
-### Workspace Instructions Directory
+NanoBot ships with example instruction files in `/config/nanobot/workspace/instructions/`:
 
-Instruction files are placed in:
-```
-/config/nanobot/workspace/instructions/
-```
-
-On first start, NanoBot installs three example templates:
-
-| File | Purpose |
-|------|---------|
-| `morning-briefing.md` | Daily 7am home summary sent to Discord |
+| Template | What it does |
+|---|---|
+| `morning-briefing.md` | Daily 7am home summary |
 | `security-watch.md` | Overnight motion/door alerts |
 | `energy-monitor.md` | Weekly energy usage report |
 
-Edit these files in HA's **Studio Code Server** or **File Editor** add-on to customize them.
+Edit them with the **File Editor** or **Studio Code Server** add-on. Write your own in natural language — just describe what you want NanoBot to do and include a cron expression.
 
-### Creating Custom Instructions
+### REST API
 
-Any `.md` file in the `instructions/` directory is read by the NanoBot agent. Use natural language to describe what you want NanoBot to do. Include cron expressions or trigger conditions.
-
-**Example — Daily Irrigation Check:**
-```markdown
-# Irrigation Check
-
-Every day at 06:00, check:
-1. Use ha_get_state to check weather.home forecast
-2. If rain is expected today, use ha_call_service to turn off switch.irrigation_zone1
-3. Otherwise, turn it on for 20 minutes
-
-cron: 0 6 * * *
-```
-
----
-
-## Phase 6: HA REST Command Integration (Zero-Code)
-
-HA automations can push tasks directly to NanoBot using the OpenAI-compatible API on port 8900. Requires `api_enabled: true`.
-
-### Configuration (`configuration.yaml`)
+Any HA automation can talk to NanoBot via REST:
 
 ```yaml
 rest_command:
@@ -265,8 +149,6 @@ rest_command:
     content_type: "application/json"
     payload: '{"messages": [{"role": "user", "content": "{{ message }}"}], "stream": false}'
 ```
-
-### Automation Example
 
 ```yaml
 automation:
@@ -278,60 +160,45 @@ automation:
     action:
       - service: rest_command.ask_nanobot
         data:
-          message: "The doorbell just rang. Who might it be and what should I do?"
+          message: "The doorbell just rang. What should I do?"
 ```
 
 ---
 
-## API Access
+## All Options
 
-| Port | Endpoint | Description |
-|------|----------|-------------|
-| **18790** | `http://<ha-ip>:18790/` | NanoBot Gateway (channels, cron, heartbeat — no HTTP API) |
-| **8900** | `http://<ha-ip>:8900/v1` | OpenAI-compatible API (when `api_enabled: true`) |
+| Option | Default | Description |
+|---|---|---|
+| **LLM Provider** | `custom` | Provider name (`custom`, `openai`, `anthropic`, `openrouter`) |
+| **LLM API Key** | | API key for the provider |
+| **LLM Base URL** | | Base URL for the API endpoint |
+| **LLM Model** | `claude-4.5` | Model name |
+| **Enable Discord** | `false` | Start the Discord bot |
+| **Discord Bot Token** | | Bot token |
+| **Discord Channel ID** | | Restrict to a channel |
+| **Discord Allowed Users** | `*` | Allowed user IDs |
+| **Discord Group Policy** | `open` | `open` or `mention` |
+| **Log Level** | `info` | `trace`, `debug`, `info`, `warning`, `error` |
+| **Enable HA MCP** | `false` | Connect to ha-mcp for smart home tools |
+| **HA MCP URL** | | MCP server URL from ha-mcp logs |
+| **HA Access Token** | | Long-Lived Access Token (only for remote HA) |
+| **HA Read-Only** | `true` | Restrict to read-only tools |
+| **Enable API** | `false` | OpenAI-compatible API on port 8900 |
+| **Auto Conversation Agent** | `false` | Auto-register as HA voice assistant |
+| **Enable Event Streaming** | `false` | Subscribe to HA event bus |
+| **Event Types** | `state_changed` | Comma-separated event types |
+| **Enable MQTT** | `false` | MQTT bridge (requires Mosquitto) |
 
-The gateway on port 18790 manages channels (Discord, etc.), cron jobs, and heartbeat. It does **not** expose any HTTP endpoints.
+## Ports
 
-The OpenAI-compatible API on port 8900 provides `POST /v1/chat/completions`, `GET /v1/models`, and `GET /health`. This is the endpoint used by HA Conversation, MQTT bridge, and REST commands.
-
----
-
-## Architecture
-
-```
-User (voice / dashboard)
-        │
-        ▼
-HA Assist → openai_conversation → NanoBot API :8900
-                                        │
-                                        ▼
-                               NanoBot Agent Loop
-                               ├── LLM Provider (external)
-                               ├── ha-mcp tools → HA REST API
-                               ├── mqtt_* tools → Mosquitto broker
-                               ├── filesystem → /config/nanobot/workspace/
-                               └── Discord channel → User
-
-HA Event Bus ──WebSocket──→ ha_event_listener.py
-                                        │
-                                        ▼
-                           /config/nanobot/workspace/events/
-                                        │
-                                  NanoBot cron tick
-                                        │
-                                Discord alert / HA action
-
-HA Automation ──mqtt.publish──→ nanobot/inbox
-                                        │
-                                  MQTT Bridge
-                                        │
-                               NanoBot Gateway :18790
-```
+| Port | Service |
+|---|---|
+| **8900** | OpenAI-compatible API (`/v1/chat/completions`, `/v1/models`, `/health`) |
+| **18790** | NanoBot Gateway (channels, cron, heartbeat — internal, no HTTP API) |
 
 ---
 
 ## Support
 
-- [NanoBot GitHub](https://github.com/HKUDS/nanobot)
-- [NanoBot Documentation](https://github.com/HKUDS/nanobot#readme)
-- [ha-mcp GitHub](https://github.com/homeassistant-ai/ha-mcp)
+- [NanoBot](https://github.com/HKUDS/nanobot) — upstream project
+- [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) — Home Assistant MCP server
