@@ -216,26 +216,24 @@ if [ "${WEBUI_ENABLED}" = "true" ]; then
     # Extract static files from webui package at runtime
     echo "[INFO] Extracting WebUI static files..."
     mkdir -p /usr/share/nginx/html
+    
+    # Simple extraction
     python3 -c "
-import webui.web
-import os, shutil
-src = os.path.join(os.path.dirname(webui.web.__file__), 'dist')
+import os, shutil, webui.web as w
+src = os.path.join(os.path.dirname(w.__file__), 'dist')
 dst = '/usr/share/nginx/html'
-print(f'Source: {src}, exists: {os.path.isdir(src)}')
 if os.path.isdir(src):
     for f in os.listdir(src):
-        src_path = os.path.join(src, f)
-        dst_path = os.path.join(dst, f)
-        if os.path.isdir(src_path):
-            shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
-            print(f'Copied dir: {f}')
+        s = os.path.join(src, f)
+        d = os.path.join(dst, f)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, dirs_exist_ok=True)
         else:
-            shutil.copy2(src_path, dst_path)
-            print(f'Copied file: {f}')
-    print('Static files extracted successfully')
+            shutil.copy2(s, d)
+    print('Done')
 else:
-    print('WARNING: src directory does not exist')
-" 2>&1
+    print(f'Missing: {src}')
+"
     
     # Verify files exist
     ls -la /usr/share/nginx/html/ 2>&1 || echo "[ERROR] html directory empty"
