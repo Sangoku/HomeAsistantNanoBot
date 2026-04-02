@@ -22,6 +22,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+.kilo
 
 # Dev environment generated files
 dev/.storage/

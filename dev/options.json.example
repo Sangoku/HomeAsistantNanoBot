@@ -8,5 +8,13 @@
   "discord_channel_id": "your-discord-channel-id-here",
   "discord_allowed_users": "*",
   "discord_group_policy": "open",
-  "log_level": "debug"
+  "log_level": "debug",
+  "ha_mcp_enabled": false,
+  "ha_mcp_url": "",
+  "ha_access_token": "",
+  "ha_read_only": true,
+  "api_enabled": false,
+  "ha_events_enabled": false,
+  "ha_event_types": "state_changed",
+  "mqtt_enabled": false
 }

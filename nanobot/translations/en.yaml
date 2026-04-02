@@ -30,7 +30,64 @@ configuration:
     name: Discord Channel ID
     description: >-
       The Discord channel ID to restrict the bot to. Leave empty to allow all channels.
+  discord_allowed_users:
+    name: Discord Allowed Users
+    description: >-
+      Comma-separated list of Discord user IDs allowed to chat with NanoBot.
+      Use "*" to allow all users (default).
+  discord_group_policy:
+    name: Discord Group Policy
+    description: >-
+      How NanoBot responds in group channels. "open" responds to all messages;
+      "mention" responds only when @mentioned.
   log_level:
     name: Log Level
     description: >-
       The log level for NanoBot. Use "debug" for troubleshooting.
+  ha_mcp_enabled:
+    name: Enable Home Assistant MCP
+    description: >-
+      Connect NanoBot to your Home Assistant via the ha-mcp add-on.
+      NanoBot gains 92 tools to read and control your entire smart home.
+      Requires the ha-mcp add-on to be installed separately — see the documentation.
+  ha_mcp_url:
+    name: HA MCP Server URL
+    description: >-
+      The URL of the ha-mcp MCP server. Found in the ha-mcp add-on logs after installation.
+      Example: http://homeassistant.local:8808/mcp
+  ha_access_token:
+    name: HA Long-Lived Access Token
+    description: >-
+      A Home Assistant Long-Lived Access Token (created in your HA profile page).
+      Only required if connecting to a remote HA instance — leave blank when
+      ha-mcp is installed as a local add-on (it handles authentication automatically).
+  ha_read_only:
+    name: HA Read-Only Mode
+    description: >-
+      When enabled (default), NanoBot can only read and query your home state —
+      it cannot call services, change device states, or modify automations.
+      Disable to grant full control (use with caution).
+  api_enabled:
+    name: Enable OpenAI-Compatible API
+    description: >-
+      Expose NanoBot's OpenAI-compatible API on port 8900.
+      Enables Home Assistant's "openai_conversation" integration to use NanoBot
+      as the AI brain for HA Assist and voice commands.
+      Point the HA integration at http://<your-ha-ip>:8900/v1
+  ha_events_enabled:
+    name: Enable HA Event Streaming
+    description: >-
+      Subscribe to Home Assistant's event bus and write event files to the
+      NanoBot workspace. NanoBot can then react to home events (motion detected,
+      doors opened, etc.) using its cron/proactive agent capabilities.
+  ha_event_types:
+    name: HA Event Types
+    description: >-
+      Comma-separated list of Home Assistant event types to subscribe to.
+      Default: "state_changed". Examples: "state_changed,call_service,automation_triggered"
+  mqtt_enabled:
+    name: Enable MQTT Integration
+    description: >-
+      Enable bidirectional MQTT communication. NanoBot will auto-detect the
+      Mosquitto broker add-on and subscribe to "nanobot/inbox" for incoming tasks,
+      publishing responses to "nanobot/outbox". Requires the Mosquitto broker add-on.

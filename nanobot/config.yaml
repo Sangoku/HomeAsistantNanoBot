@@ -1,9 +1,9 @@
 name: "NanoBot AI Assistant"
-version: "0.1.4"
+version: "0.2.0"
 slug: "nanobot"
 description: >-
   Ultra-lightweight personal AI assistant powered by NanoBot.
-  Supports multiple LLM providers and Discord integration.
+  Supports multiple LLM providers, Discord integration, and Home Assistant smart home control.
 url: "https://github.com/HKUDS/nanobot"
 arch:
   - amd64
@@ -13,13 +13,17 @@ boot: auto
 init: false
 ports:
   18790/tcp: 18790
+  8900/tcp: 8900
 ports_description:
   18790/tcp: "NanoBot Gateway API"
+  8900/tcp: "NanoBot OpenAI-compatible API (for HA Conversation integration)"
 map:
   - type: data
     read_only: false
   - type: config
     read_only: false
+services:
+  - mqtt:need
 options:
   llm_provider: "custom"
   llm_api_key: ""
@@ -31,6 +35,18 @@ options:
   discord_allowed_users: "*"
   discord_group_policy: "open"
   log_level: "info"
+  # Home Assistant MCP Integration (Phase 1)
+  ha_mcp_enabled: false
+  ha_mcp_url: ""
+  ha_access_token: ""
+  ha_read_only: true
+  # OpenAI-compatible API for HA Conversation (Phase 2)
+  api_enabled: false
+  # HA Event Streaming (Phase 3)
+  ha_events_enabled: false
+  ha_event_types: "state_changed"
+  # MQTT Integration (Phase 4)
+  mqtt_enabled: false
 schema:
   llm_provider: "str"
   llm_api_key: "password"
@@ -42,3 +58,15 @@ schema:
   discord_allowed_users: "str?"
   discord_group_policy: "list(open|mention)?"
   log_level: "list(trace|debug|info|warning|error)"
+  # Home Assistant MCP Integration
+  ha_mcp_enabled: "bool"
+  ha_mcp_url: "url?"
+  ha_access_token: "password?"
+  ha_read_only: "bool"
+  # OpenAI-compatible API
+  api_enabled: "bool"
+  # HA Event Streaming
+  ha_events_enabled: "bool"
+  ha_event_types: "str?"
+  # MQTT Integration
+  mqtt_enabled: "bool"

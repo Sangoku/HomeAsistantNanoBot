@@ -19,15 +19,23 @@ RUN apk add --no-cache \
     jq \
     bash
 
-# Install nanobot-ai from PyPI with Discord support
-RUN pip3 install --no-cache-dir --break-system-packages "nanobot-ai[discord]"
+# Install nanobot-ai from PyPI with Discord + API server support
+RUN pip3 install --no-cache-dir --break-system-packages "nanobot-ai[discord]" aiohttp
+
+# Phase 3: websockets for HA event streaming
+# Phase 4: paho-mqtt for MQTT bidirectional channel
+RUN pip3 install --no-cache-dir --break-system-packages websockets paho-mqtt
 
 # Create app directory
 WORKDIR /app
 
 # Copy config generator and run script
 COPY generate_config.py /app/generate_config.py
+COPY nanobot_api_server.py /app/nanobot_api_server.py
 COPY run.sh /
+COPY ha_event_listener.py /app/ha_event_listener.py
+COPY ha_mqtt_bridge.py /app/ha_mqtt_bridge.py
+COPY workspace-templates/ /app/workspace-templates/
 
 RUN chmod a+x /run.sh
 

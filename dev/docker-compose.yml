@@ -11,7 +11,8 @@ name: nanobot-dev
 #
 # NanoBot has NO web GUI — it's a headless AI agent.
 # Interact with it via Discord (channel configured in dev/.env).
-# Port 18790 is the internal WhatsApp bridge WebSocket (not a web UI).
+# Port 18790 is the NanoBot gateway (channels, cron, heartbeat).
+# Port 8900 is the OpenAI-compatible API (requires api_enabled=true).
 
 services:
 
@@ -38,8 +39,23 @@ services:
       NANOBOT_DISCORD_CHANNEL_ID: ${DISCORD_CHANNEL_ID:-}
       NANOBOT_DISCORD_ALLOWED_USERS: ${DISCORD_ALLOWED_USERS:-*}
       NANOBOT_DISCORD_GROUP_POLICY: ${DISCORD_GROUP_POLICY:-open}
+      # HA Integration settings
+      NANOBOT_HA_MCP_ENABLED: ${HA_MCP_ENABLED:-false}
+      NANOBOT_HA_MCP_URL: ${HA_MCP_URL:-}
+      NANOBOT_HA_ACCESS_TOKEN: ${HA_ACCESS_TOKEN:-}
+      NANOBOT_HA_READ_ONLY: ${HA_READ_ONLY:-true}
+      NANOBOT_API_ENABLED: ${API_ENABLED:-false}
+      NANOBOT_HA_EVENTS_ENABLED: ${HA_EVENTS_ENABLED:-false}
+      NANOBOT_HA_EVENT_TYPES: ${HA_EVENT_TYPES:-state_changed}
+      NANOBOT_MQTT_ENABLED: ${MQTT_ENABLED:-false}
+      # MQTT broker (dev mode — no bashio service discovery)
+      NANOBOT_MQTT_HOST: ${MQTT_HOST:-}
+      NANOBOT_MQTT_PORT: ${MQTT_PORT:-1883}
+      NANOBOT_MQTT_USER: ${MQTT_USER:-}
+      NANOBOT_MQTT_PASS: ${MQTT_PASS:-}
     ports:
-      - "18790:18790"   # NanoBot WhatsApp bridge WebSocket (internal)
+      - "18790:18790"   # NanoBot gateway (channels, cron, heartbeat)
+      - "8900:8900"     # OpenAI-compatible API (when api_enabled=true)
     volumes:
       # Mock HA Supervisor options.json — template only, env vars take precedence
       - ./options.json:/data/options.json:ro
@@ -53,6 +69,9 @@ services:
       # Live-edit addon scripts without rebuilding the image
       - ../nanobot/run.sh:/run.sh:ro
       - ../nanobot/generate_config.py:/app/generate_config.py:ro
+      - ../nanobot/nanobot_api_server.py:/app/nanobot_api_server.py:ro
+      - ../nanobot/ha_event_listener.py:/app/ha_event_listener.py:ro
+      - ../nanobot/ha_mqtt_bridge.py:/app/ha_mqtt_bridge.py:ro
     restart: unless-stopped
 
 volumes:
