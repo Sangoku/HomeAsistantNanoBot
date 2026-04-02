@@ -119,7 +119,7 @@ async def main() -> None:
                 ws,
                 {
                     "id": msg_id,
-                    "type": "config_entries/flow",
+                    "type": "config_entries/flow/create",
                     "handler": INTEGRATION_DOMAIN,
                     "context": {"source": "user"},
                 },
@@ -154,7 +154,7 @@ async def main() -> None:
                 ws,
                 {
                     "id": msg_id,
-                    "type": "config_entries/flow",
+                    "type": "config_entries/flow/configure",
                     "flow_id": flow_id,
                     "data": {
                         "api_key": NANOBOT_API_KEY,
@@ -193,7 +193,7 @@ async def main() -> None:
                         ws,
                         {
                             "id": msg_id,
-                            "type": "config_entries/flow",
+                            "type": "config_entries/flow/configure",
                             "flow_id": flow_id,
                             "data": {},  # accept defaults
                         },
