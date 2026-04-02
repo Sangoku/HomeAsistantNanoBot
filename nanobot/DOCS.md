@@ -93,15 +93,29 @@ ha_config_set_automation — create/modify automations (full-access only)
 
 NanoBot can become the AI brain behind HA Assist — handling voice commands with full smart home context.
 
-### Setup
+### Automatic Setup (Recommended)
+
+1. Set **Enable OpenAI-Compatible API** to `true`.
+2. Set **Auto-register as Conversation Agent** to `true`.
+3. Restart the add-on.
+
+NanoBot will automatically:
+- Create an OpenAI Conversation integration entry in HA pointing at `http://localhost:8900/v1`
+- Set NanoBot as the conversation agent in your default Assist pipeline
+
+No manual configuration in HA is needed. NanoBot registers itself on every startup (idempotent — skips if already configured).
+
+### Manual Setup
+
+If you prefer to configure it manually, or if auto-registration isn't available:
 
 1. Set **Enable OpenAI-Compatible API** to `true` in the NanoBot add-on configuration.
-2. In Home Assistant, go to **Settings → Devices & Services → Add Integration**.
+2. In Home Assistant, go to **Settings -> Devices & Services -> Add Integration**.
 3. Search for **OpenAI Conversation** and add it.
 4. Configure it with:
    - **API Key**: any non-empty string (e.g., `nanobot`)
    - **Base URL**: `http://<your-ha-ip>:8900/v1`
-5. Go to **Settings → Voice Assistants**, create or edit a voice assistant, and set **Conversation agent** to the NanoBot OpenAI integration.
+5. Go to **Settings -> Voice Assistants**, create or edit a voice assistant, and set **Conversation agent** to the NanoBot OpenAI integration.
 
 NanoBot will now handle all voice and Assist queries with full HA context via its MCP tools.
 

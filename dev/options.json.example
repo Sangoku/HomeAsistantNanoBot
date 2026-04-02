@@ -14,6 +14,7 @@
   "ha_access_token": "",
   "ha_read_only": true,
   "api_enabled": false,
+  "auto_conversation_agent": false,
   "ha_events_enabled": false,
   "ha_event_types": "state_changed",
   "mqtt_enabled": false

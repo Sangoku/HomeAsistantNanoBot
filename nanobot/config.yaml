@@ -42,6 +42,7 @@ options:
   ha_read_only: true
   # OpenAI-compatible API for HA Conversation (Phase 2)
   api_enabled: false
+  auto_conversation_agent: false
   # HA Event Streaming (Phase 3)
   ha_events_enabled: false
   ha_event_types: "state_changed"
@@ -65,6 +66,7 @@ schema:
   ha_read_only: "bool"
   # OpenAI-compatible API
   api_enabled: "bool"
+  auto_conversation_agent: "bool"
   # HA Event Streaming
   ha_events_enabled: "bool"
   ha_event_types: "str?"

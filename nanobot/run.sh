@@ -22,6 +22,7 @@ if [ "${IS_HA_SUPERVISOR}" = "true" ]; then
     # HA Supervisor environment — use bashio
     LOG_LEVEL=$(bashio::config 'log_level' 'info')
     API_ENABLED=$(bashio::config 'api_enabled' 'false')
+    AUTO_CONVERSATION_AGENT=$(bashio::config 'auto_conversation_agent' 'false')
     HA_MCP_ENABLED=$(bashio::config 'ha_mcp_enabled' 'false')
     HA_EVENTS_ENABLED=$(bashio::config 'ha_events_enabled' 'false')
     HA_EVENT_TYPES=$(bashio::config 'ha_event_types' 'state_changed')
@@ -35,6 +36,7 @@ else
     # (s6-overlay may strip docker env vars, so options.json is the primary source)
     LOG_LEVEL=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); print(os.environ.get('NANOBOT_LOG_LEVEL','').strip() or d.get('log_level','info'))" 2>/dev/null || echo "info")
     API_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_API_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('api_enabled',False)).lower())" 2>/dev/null || echo "false")
+    AUTO_CONVERSATION_AGENT=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_AUTO_CONVERSATION_AGENT','').strip().lower(); print(v if v in ('true','false') else str(d.get('auto_conversation_agent',False)).lower())" 2>/dev/null || echo "false")
     HA_MCP_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_HA_MCP_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('ha_mcp_enabled',False)).lower())" 2>/dev/null || echo "false")
     HA_EVENTS_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_HA_EVENTS_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('ha_events_enabled',False)).lower())" 2>/dev/null || echo "false")
     HA_EVENT_TYPES=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); print(os.environ.get('NANOBOT_HA_EVENT_TYPES','').strip() or d.get('ha_event_types','state_changed'))" 2>/dev/null || echo "state_changed")
@@ -76,6 +78,32 @@ if [ "${API_ENABLED}" = "true" ]; then
     sleep 2
 else
     echo "[INFO] OpenAI-compatible API: disabled"
+fi
+
+# ==============================================================================
+# Phase 2b — Auto-register as HA Conversation Agent
+# Requires API server to be running (api_enabled=true).
+# Uses HA WebSocket API to create an openai_conversation config entry
+# pointing at NanoBot's API, then sets it as the default assist agent.
+# Only works under real HA Supervisor (SUPERVISOR_TOKEN must be valid).
+# ==============================================================================
+if [ "${AUTO_CONVERSATION_AGENT}" = "true" ]; then
+    if [ "${API_ENABLED}" != "true" ]; then
+        echo "[WARNING] auto_conversation_agent=true but api_enabled=false."
+        echo "[WARNING] The API server must be running for conversation agent registration."
+        echo "[WARNING] Enabling api_enabled would fix this."
+    elif [ "${IS_HA_SUPERVISOR}" = "true" ] || [ -n "${SUPERVISOR_TOKEN:-}" ]; then
+        echo "[INFO] Auto-registering NanoBot as HA conversation agent..."
+        # Run in background — non-blocking, best-effort.
+        # If it fails, the add-on still starts normally.
+        python3 /app/setup_conversation_agent.py &
+        SETUP_AGENT_PID=$!
+        echo "[INFO] Conversation agent setup started (PID: ${SETUP_AGENT_PID})"
+    else
+        echo "[INFO] auto_conversation_agent: skipped (not running under HA Supervisor)"
+    fi
+else
+    echo "[INFO] Auto conversation agent registration: disabled"
 fi
 
 # ==============================================================================

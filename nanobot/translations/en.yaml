@@ -74,6 +74,14 @@ configuration:
       Enables Home Assistant's "openai_conversation" integration to use NanoBot
       as the AI brain for HA Assist and voice commands.
       Point the HA integration at http://<your-ha-ip>:8900/v1
+  auto_conversation_agent:
+    name: Auto-register as Conversation Agent
+    description: >-
+      Automatically register NanoBot as a conversation agent in Home Assistant
+      on startup. Creates an OpenAI Conversation integration entry pointing at
+      NanoBot's API and sets it as the default voice assistant.
+      Requires "Enable OpenAI-Compatible API" to be enabled.
+      Only works when running as an HA add-on (not in standalone/dev mode).
   ha_events_enabled:
     name: Enable HA Event Streaming
     description: >-

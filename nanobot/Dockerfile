@@ -32,6 +32,7 @@ WORKDIR /app
 # Copy config generator and run script
 COPY generate_config.py /app/generate_config.py
 COPY nanobot_api_server.py /app/nanobot_api_server.py
+COPY setup_conversation_agent.py /app/setup_conversation_agent.py
 COPY run.sh /
 COPY ha_event_listener.py /app/ha_event_listener.py
 COPY ha_mqtt_bridge.py /app/ha_mqtt_bridge.py

@@ -45,6 +45,7 @@ services:
       NANOBOT_HA_ACCESS_TOKEN: ${HA_ACCESS_TOKEN:-}
       NANOBOT_HA_READ_ONLY: ${HA_READ_ONLY:-true}
       NANOBOT_API_ENABLED: ${API_ENABLED:-false}
+      NANOBOT_AUTO_CONVERSATION_AGENT: ${AUTO_CONVERSATION_AGENT:-false}
       NANOBOT_HA_EVENTS_ENABLED: ${HA_EVENTS_ENABLED:-false}
       NANOBOT_HA_EVENT_TYPES: ${HA_EVENT_TYPES:-state_changed}
       NANOBOT_MQTT_ENABLED: ${MQTT_ENABLED:-false}
@@ -70,6 +71,7 @@ services:
       - ../nanobot/run.sh:/run.sh:ro
       - ../nanobot/generate_config.py:/app/generate_config.py:ro
       - ../nanobot/nanobot_api_server.py:/app/nanobot_api_server.py:ro
+      - ../nanobot/setup_conversation_agent.py:/app/setup_conversation_agent.py:ro
       - ../nanobot/ha_event_listener.py:/app/ha_event_listener.py:ro
       - ../nanobot/ha_mqtt_bridge.py:/app/ha_mqtt_bridge.py:ro
     restart: unless-stopped
