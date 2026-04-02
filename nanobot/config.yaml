@@ -1,5 +1,5 @@
 name: "NanoBot AI Assistant"
-version: "0.2.5"
+version: "0.2.6"
 slug: "nanobot"
 description: >-
   Ultra-lightweight personal AI assistant powered by NanoBot.
@@ -12,6 +12,7 @@ startup: application
 boot: auto
 init: false
 ingress: true
+ingress_port: 18780
 panel_icon: mdi:cat
 panel_title: "NanoBot"
 ports:
