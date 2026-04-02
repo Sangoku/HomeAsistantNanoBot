@@ -207,47 +207,21 @@ if [ -d "${TEMPLATES_DIR}" ]; then
 fi
 
 # ==============================================================================
-# Phase 6 — WebUI (nanobot-webui) with Nginx reverse proxy for ingress
+# Phase 6 — WebUI (nanobot-webui) on port 8099 for HA Ingress
 # ==============================================================================
 if [ "${WEBUI_ENABLED}" = "true" ]; then
-    echo "[INFO] NanoBot WebUI enabled..."
+    echo "[INFO] NanoBot WebUI enabled on port 8099 for HA ingress..."
     
-    # Extract static files from webui package if not already done
-    if [ ! -d "/usr/share/nginx/html/assets" ]; then
-        echo "[INFO] Extracting WebUI static files..."
-        python3 -c "
-import webui.web
-import os, shutil
-src = os.path.join(os.path.dirname(webui.web.__file__), 'dist')
-dst = '/usr/share/nginx/html'
-if os.path.isdir(src):
-    for f in os.listdir(src):
-        src_path = os.path.join(src, f)
-        dst_path = os.path.join(dst, f)
-        if os.path.isdir(src_path):
-            shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
-        else:
-            shutil.copy2(src_path, dst_path)
-print('Static files extracted')
-" || echo "[WARNING] Failed to extract static files"
-    fi
-    
-    # Start WebUI backend on port 18781 (nginx proxies 18780 -> 18781)
-    export WEBUI_PORT=18781
-    export WEBUI_HOST="127.0.0.1"
+    # Run WebUI directly on port 8099 (HA ingress default port)
+    export WEBUI_PORT=8099
+    export WEBUI_HOST="0.0.0.0"
     export WEBUI_ONLY=true
     export WEBUI_LOG_LEVEL="${LOG_LEVEL}"
-    nanobot webui start --host 127.0.0.1 &
+    nanobot webui start --port 8099 --host 0.0.0.0 &
     WEBUI_PID=$!
-    echo "[INFO] WebUI backend started (PID: ${WEBUI_PID}, port: 18781)"
+    echo "[INFO] WebUI started (PID: ${WEBUI_PID}, port: 8099)"
     
-    # Start nginx to serve static files and proxy API to backend
-    echo "[INFO] Starting nginx on port 18780..."
-    nginx -g 'daemon off;' &
-    NGINX_PID=$!
-    echo "[INFO] Nginx started (PID: ${NGINX_PID})"
-    
-    sleep 3
+    sleep 5
 else
     echo "[INFO] NanoBot WebUI: disabled"
 fi
