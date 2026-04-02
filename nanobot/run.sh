@@ -209,16 +209,19 @@ fi
 # ==============================================================================
 # Phase 6 — WebUI (nanobot-webui)
 # Start the web management panel if enabled.
-# Uses --webui-only to avoid conflicts with existing nanobot channels.
+# Uses WEBUI_ONLY env var (not CLI flag) for cleaner daemon handling.
 # ==============================================================================
 if [ "${WEBUI_ENABLED}" = "true" ]; then
     echo "[INFO] NanoBot WebUI enabled on port 18780..."
-    nanobot webui start --port 18780 --host 0.0.0.0 --webui-only --log-level "${LOG_LEVEL}" &
+    export WEBUI_PORT=18780
+    export WEBUI_HOST="0.0.0.0"
+    export WEBUI_ONLY=true
+    export WEBUI_LOG_LEVEL="${LOG_LEVEL}"
+    nanobot webui start --host 0.0.0.0 &
     WEBUI_PID=$!
     echo "[INFO] WebUI started (PID: ${WEBUI_PID})"
-
-    # Wait briefly for the WebUI to bind
-    sleep 3
+    echo "[INFO] Waiting for WebUI to start..."
+    sleep 8
 else
     echo "[INFO] NanoBot WebUI: disabled"
 fi
