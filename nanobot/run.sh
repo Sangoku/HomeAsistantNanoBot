@@ -244,9 +244,23 @@ print('Static files extracted')
     
     # Start nginx on port 8099 (HA ingress)
     echo "[INFO] Starting nginx on port 8099..."
-    nginx -g 'daemon off;' &
+    nginx -t -c /etc/nginx/http.d/nanobot.conf 2>&1 || echo "[WARNING] Nginx config test failed"
+    nginx -c /etc/nginx/http.d/nanobot.conf &
     NGINX_PID=$!
-    echo "[INFO] Nginx started (PID: ${NGINX_PID})"
+    sleep 1
+    if ps -p $NGINX_PID > /dev/null 2>&1; then
+        echo "[INFO] Nginx started (PID: ${NGINX_PID})"
+    else
+        echo "[ERROR] Nginx failed to start, falling back to direct mode..."
+        # Fallback: run WebUI directly on port 8099
+        export WEBUI_PORT=8099
+        export WEBUI_HOST="0.0.0.0"
+        export WEBUI_ONLY=true
+        export WEBUI_LOG_LEVEL="${LOG_LEVEL}"
+        nanobot webui start --port 8099 --host 0.0.0.0 &
+        WEBUI_PID=$!
+        echo "[INFO] WebUI fallback started (PID: ${WEBUI_PID}, port: 8099)"
+    fi
     
     sleep 3
 else
