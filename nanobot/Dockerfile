@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Install system dependencies
+# Install nginx and create user
 RUN apk add --no-cache \
     python3-dev \
     py3-pip \
@@ -32,7 +32,9 @@ RUN pip3 install --no-cache-dir --break-system-packages websockets paho-mqtt
 RUN pip3 install --no-cache-dir --break-system-packages nanobot-webui
 
 # Extract web UI static files to nginx directory
-RUN mkdir -p /usr/share/nginx/html && \
+RUN mkdir -p /usr/share/nginx/html /run/nginx /var/log/nginx && \
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
     python3 -c "import webui.web; import os, shutil; src = os.path.join(os.path.dirname(webui.web.__file__), 'dist'); dst = '/usr/share/nginx/html'; [shutil.copytree(os.path.join(src, f), os.path.join(dst, f)) for f in os.listdir(src) if os.path.isdir(os.path.join(src, f))] if os.path.isdir(src) else None" || true
 
 # Copy nginx config for ingress
