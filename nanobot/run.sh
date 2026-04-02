@@ -27,6 +27,7 @@ if [ "${IS_HA_SUPERVISOR}" = "true" ]; then
     HA_EVENTS_ENABLED=$(bashio::config 'ha_events_enabled' 'false')
     HA_EVENT_TYPES=$(bashio::config 'ha_event_types' 'state_changed')
     MQTT_ENABLED=$(bashio::config 'mqtt_enabled' 'false')
+    WEBUI_ENABLED=$(bashio::config 'webui_enabled' 'true')
     bashio::log.info "Starting NanoBot AI Assistant..."
     bashio::log.info "Log level: ${LOG_LEVEL}"
     bashio::log.info "Generating NanoBot configuration..."
@@ -41,6 +42,7 @@ else
     HA_EVENTS_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_HA_EVENTS_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('ha_events_enabled',False)).lower())" 2>/dev/null || echo "false")
     HA_EVENT_TYPES=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); print(os.environ.get('NANOBOT_HA_EVENT_TYPES','').strip() or d.get('ha_event_types','state_changed'))" 2>/dev/null || echo "state_changed")
     MQTT_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_MQTT_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('mqtt_enabled',False)).lower())" 2>/dev/null || echo "false")
+    WEBUI_ENABLED=$(python3 -c "import os,json; d=json.load(open('/data/options.json')); v=os.environ.get('NANOBOT_WEBUI_ENABLED','').strip().lower(); print(v if v in ('true','false') else str(d.get('webui_enabled',True)).lower())" 2>/dev/null || echo "true")
     echo "[INFO] Starting NanoBot AI Assistant (standalone/dev mode)..."
     echo "[INFO] Log level: ${LOG_LEVEL}"
     echo "[INFO] Generating NanoBot configuration..."
@@ -202,6 +204,23 @@ if [ -d "${TEMPLATES_DIR}" ]; then
             fi
         fi
     done
+fi
+
+# ==============================================================================
+# Phase 6 — WebUI (nanobot-webui)
+# Start the web management panel if enabled.
+# Uses --webui-only to avoid conflicts with existing nanobot channels.
+# ==============================================================================
+if [ "${WEBUI_ENABLED}" = "true" ]; then
+    echo "[INFO] NanoBot WebUI enabled on port 18780..."
+    nanobot webui start --port 18780 --host 0.0.0.0 --webui-only --log-level "${LOG_LEVEL}" &
+    WEBUI_PID=$!
+    echo "[INFO] WebUI started (PID: ${WEBUI_PID})"
+
+    # Wait briefly for the WebUI to bind
+    sleep 3
+else
+    echo "[INFO] NanoBot WebUI: disabled"
 fi
 
 echo "[INFO] Starting NanoBot gateway on port 18790..."

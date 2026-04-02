@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Removed WebUI auth bypass (`webui_no_auth` option and `webui_auth_bypass.py`) — login is now always required
+- Default credentials: username `admin`, password `nanobot` (auto-created on first run)
+- Added WebUI login instructions to docs and READMEs
+
 ## 0.2.0
 
 ### Home Assistant Integration (6 phases)

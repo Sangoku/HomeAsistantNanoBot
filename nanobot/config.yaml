@@ -1,5 +1,5 @@
 name: "NanoBot AI Assistant"
-version: "0.2.2"
+version: "0.2.3"
 slug: "nanobot"
 description: >-
   Ultra-lightweight personal AI assistant powered by NanoBot.
@@ -12,9 +12,11 @@ startup: application
 boot: auto
 init: false
 ports:
+  18780/tcp: 18780
   18790/tcp: 18790
   8900/tcp: 8900
 ports_description:
+  18780/tcp: "NanoBot WebUI (Ingress)"
   18790/tcp: "NanoBot Gateway API"
   8900/tcp: "NanoBot OpenAI-compatible API (for HA Conversation integration)"
 map:
@@ -49,6 +51,8 @@ options:
   ha_event_types: "state_changed"
   # MQTT Integration (Phase 4)
   mqtt_enabled: false
+  # WebUI (Phase 5)
+  webui_enabled: true
 schema:
   llm_provider: "str"
   llm_api_key: "password"
@@ -73,3 +77,5 @@ schema:
   ha_event_types: "str?"
   # MQTT Integration
   mqtt_enabled: "bool"
+  # WebUI
+  webui_enabled: "bool"

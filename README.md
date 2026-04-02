@@ -163,12 +163,14 @@ NanoBot sits in the middle of everything. It talks to your LLM for intelligence,
 | **Enable MQTT** | off | MQTT bridge (needs Mosquitto add-on + API enabled) |
 | **Enable Event Streaming** | off | Subscribe to HA event bus |
 | **Event Types** | `state_changed` | Which events to watch (comma-separated) |
+| **Enable WebUI** | on | Web management panel on port 18780 (login: admin / nanobot) |
 | **Log Level** | `info` | `trace` / `debug` / `info` / `warning` / `error` |
 
 ### Ports
 
 | Port | What lives there |
 |---|---|
+| **18780** | NanoBot WebUI (web management panel, login: admin / nanobot) |
 | **8900** | OpenAI-compatible API (`/v1/chat/completions`, `/v1/models`, `/health`) |
 | **18790** | NanoBot Gateway (channels, cron, heartbeat — internal plumbing, no HTTP) |
 

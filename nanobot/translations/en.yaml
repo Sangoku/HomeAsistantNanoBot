@@ -99,3 +99,10 @@ configuration:
       Enable bidirectional MQTT communication. NanoBot will auto-detect the
       Mosquitto broker add-on and subscribe to "nanobot/inbox" for incoming tasks,
       publishing responses to "nanobot/outbox". Requires the Mosquitto broker add-on.
+  webui_enabled:
+    name: Enable WebUI
+    description: >-
+      Enable the NanoBot web management panel on port 18780.
+      Access it via the "Open Web UI" button in the add-on panel.
+      On first visit you will be prompted to create an admin account —
+      choose any username and password you like and use them to log in.

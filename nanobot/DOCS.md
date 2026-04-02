@@ -219,6 +219,18 @@ automation:
 
 ---
 
+## Web UI
+
+NanoBot includes a built-in web management panel on port 18780. Access it via the **Open Web UI** button in the add-on panel.
+
+**Login credentials:**
+- **Username:** `admin`
+- **Password:** `nanobot`
+
+These are the default credentials created automatically on first run. You can change the password inside the WebUI after logging in.
+
+---
+
 ## All Options
 
 | Option | Default | What it does |
@@ -241,12 +253,14 @@ automation:
 | **Enable MQTT** | off | MQTT bridge (needs Mosquitto + API enabled) |
 | **Enable Event Streaming** | off | Watch the HA event bus |
 | **Event Types** | `state_changed` | What events to watch (comma-separated) |
+| **Enable WebUI** | on | Web management panel (login: admin / nanobot) |
 | **Log Level** | `info` | `trace` / `debug` / `info` / `warning` / `error` |
 
 ## Ports
 
 | Port | What lives there |
 |---|---|
+| **18780** | NanoBot WebUI (web management panel, login: admin / nanobot) |
 | **8900** | OpenAI-compatible API (`/v1/chat/completions`, `/v1/models`, `/health`) |
 | **18790** | NanoBot Gateway (channels, cron, heartbeat — internal plumbing, no HTTP) |
 

@@ -13,6 +13,7 @@ name: nanobot-dev
 # Interact with it via Discord (channel configured in dev/.env).
 # Port 18790 is the NanoBot gateway (channels, cron, heartbeat).
 # Port 8900 is the OpenAI-compatible API (requires api_enabled=true).
+# Port 18780 is the NanoBot WebUI (requires webui_enabled=true).
 
 services:
 
@@ -54,9 +55,12 @@ services:
       NANOBOT_MQTT_PORT: ${MQTT_PORT:-1883}
       NANOBOT_MQTT_USER: ${MQTT_USER:-}
       NANOBOT_MQTT_PASS: ${MQTT_PASS:-}
+      # WebUI settings
+      NANOBOT_WEBUI_ENABLED: ${WEBUI_ENABLED:-true}
     ports:
       - "18790:18790"   # NanoBot gateway (channels, cron, heartbeat)
       - "8900:8900"     # OpenAI-compatible API (when api_enabled=true)
+      - "18780:18780"  # NanoBot WebUI (when webui_enabled=true)
     volumes:
       # Mock HA Supervisor options.json — template only, env vars take precedence
       - ./options.json:/data/options.json:ro

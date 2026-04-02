@@ -26,6 +26,10 @@ RUN pip3 install --no-cache-dir --break-system-packages "nanobot-ai[discord]" ai
 # Phase 4: paho-mqtt for MQTT bidirectional channel
 RUN pip3 install --no-cache-dir --break-system-packages websockets paho-mqtt
 
+# Phase 5: nanobot-webui for web management panel
+# Use PyPI package - includes pre-built React frontend
+RUN pip3 install --no-cache-dir --break-system-packages nanobot-webui
+
 # Create app directory
 WORKDIR /app
 
