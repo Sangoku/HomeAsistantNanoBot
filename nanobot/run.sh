@@ -217,10 +217,11 @@ if [ "${WEBUI_ENABLED}" = "true" ]; then
     echo "[INFO] Extracting WebUI static files..."
     mkdir -p /usr/share/nginx/html
     
-    # Simple extraction
+    # Simple extraction — find dist/ relative to webui package root
     python3 -c "
-import os, shutil, webui.web as w
-src = os.path.join(os.path.dirname(w.__file__), 'dist')
+import os, shutil, webui
+pkg_dir = os.path.dirname(webui.__file__)
+src = os.path.join(pkg_dir, 'web', 'dist')
 dst = '/usr/share/nginx/html'
 if os.path.isdir(src):
     for f in os.listdir(src):

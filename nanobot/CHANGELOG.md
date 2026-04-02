@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.18
+
+- Fixed startup crash caused by WebUI static file extraction (`webui.web.__file__` is `None` in nanobot-webui v0.2.6)
+
 ## 0.2.3
 
 - Removed WebUI auth bypass (`webui_no_auth` option and `webui_auth_bypass.py`) — login is now always required
