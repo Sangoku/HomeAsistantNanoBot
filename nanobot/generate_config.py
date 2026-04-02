@@ -288,14 +288,29 @@ def main():
 
     # =========================================================================
     # Write config.json
+    # nanobot gateway reads from ~/.nanobot/config.json by default.
+    # We write there as the primary location, and also write a copy to
+    # /config/nanobot/config.json for user visibility via File Editor.
     # =========================================================================
+    nanobot_home = Path.home() / ".nanobot"
+    nanobot_home.mkdir(parents=True, exist_ok=True)
+    home_config_path = nanobot_home / "config.json"
+
+    config_json = json.dumps(config, indent=2, ensure_ascii=False)
+
+    # Primary: ~/.nanobot/config.json (read by `nanobot gateway`)
+    with open(home_config_path, "w") as f:
+        f.write(config_json)
+
+    # Secondary: /config/nanobot/config.json (user-visible copy)
     with open(config_path, "w") as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
+        f.write(config_json)
 
     # =========================================================================
     # Summary log
     # =========================================================================
-    print(f"Generated nanobot config at {config_path}")
+    print(f"Generated nanobot config at {home_config_path} (gateway)")
+    print(f"  User-visible copy: {config_path}")
     print(f"  Provider: {llm_provider}")
     print(f"  Model: {llm_model}")
     print(f"  API Base: {llm_base_url if llm_base_url else '(none)'}")

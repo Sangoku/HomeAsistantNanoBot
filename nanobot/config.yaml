@@ -1,5 +1,5 @@
 name: "NanoBot AI Assistant"
-version: "0.2.0"
+version: "0.2.1"
 slug: "nanobot"
 description: >-
   Ultra-lightweight personal AI assistant powered by NanoBot.
@@ -22,6 +22,7 @@ map:
     read_only: false
   - type: config
     read_only: false
+homeassistant_api: true
 services:
   - mqtt:need
 options:
