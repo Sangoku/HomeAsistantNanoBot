@@ -14,6 +14,7 @@ init: false
 ingress: false
 panel_icon: mdi:cat
 panel_title: "NanoBot"
+webui: http://[HOST]:[PORT:18780]/dashboard
 ports:
   18780/tcp: 18780
   18790/tcp: 18790

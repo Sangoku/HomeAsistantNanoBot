@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.20
+
+- Added `webui` config for "Open Web UI" button on the add-on page (links to `http://<host>:18780/dashboard`)
+
 ## 0.2.19
 
 - Removed nginx reverse proxy and HA ingress — WebUI served directly on port 18780
