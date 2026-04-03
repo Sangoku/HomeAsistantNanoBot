@@ -207,85 +207,17 @@ if [ -d "${TEMPLATES_DIR}" ]; then
 fi
 
 # ==============================================================================
-# Phase 6 — WebUI with Nginx for HA Ingress
-# Nginx serves static files (with rewritten URLs) on 8099, proxies API to backend on 18781
+# Phase 6 — WebUI (nanobot-webui)
+# Start the web management panel if enabled.
+# Served directly on port 18780 — access via HA port mapping or direct URL.
 # ==============================================================================
 if [ "${WEBUI_ENABLED}" = "true" ]; then
-    echo "[INFO] NanoBot WebUI enabled..."
-    
-    # Extract static files from webui package at runtime
-    echo "[INFO] Extracting WebUI static files..."
-    mkdir -p /usr/share/nginx/html
-    
-    # Simple extraction — find dist/ relative to webui package root
-    python3 -c "
-import os, shutil, webui
-pkg_dir = os.path.dirname(webui.__file__)
-src = os.path.join(pkg_dir, 'web', 'dist')
-dst = '/usr/share/nginx/html'
-if os.path.isdir(src):
-    for f in os.listdir(src):
-        s = os.path.join(src, f)
-        d = os.path.join(dst, f)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, dirs_exist_ok=True)
-        else:
-            shutil.copy2(s, d)
-    print('Done')
-else:
-    print(f'Missing: {src}')
-"
-    
-    # Rewrite index.html: convert absolute paths to relative for HA ingress compatibility.
-    # HA ingress serves the UI under /api/hassio_ingress/<token>/ — absolute paths like
-    # /assets/index.js would resolve to the server root, bypassing the ingress prefix.
-    # Converting to ./assets/index.js makes the browser resolve relative to the current URL.
-    if [ -f "/usr/share/nginx/html/index.html" ]; then
-        echo "[INFO] Rewriting index.html paths for HA ingress..."
-        python3 -c "
-import re
-f = '/usr/share/nginx/html/index.html'
-html = open(f).read()
-# href=\"/...\" -> href=\"./...\"  and  src=\"/...\" -> src=\"./...\"
-html = re.sub(r'((?:href|src)=\")/', r'\1./', html)
-# Also fix manifest link
-html = html.replace('href=\"/manifest.webmanifest\"', 'href=\"./manifest.webmanifest\"')
-open(f, 'w').write(html)
-print('Done — paths rewritten to relative')
-"
-    else
-        echo "[ERROR] index.html not found after extraction!"
-    fi
-    
-    # Start WebUI backend on port 18781 (nginx proxies 8099 -> 18781)
-    export WEBUI_PORT=18781
-    export WEBUI_HOST="127.0.0.1"
-    export WEBUI_ONLY=true
-    export WEBUI_LOG_LEVEL="${LOG_LEVEL}"
-    nanobot webui start --port 18781 --host 127.0.0.1 &
+    echo "[INFO] NanoBot WebUI enabled on port 18780..."
+    nanobot webui start --port 18780 --host 0.0.0.0 --webui-only --log-level "${LOG_LEVEL}" &
     WEBUI_PID=$!
-    echo "[INFO] WebUI backend started (PID: ${WEBUI_PID}, port: 18781)"
-    
-    # Start nginx on port 8099 (HA ingress)
-    echo "[INFO] Starting nginx on port 8099..."
-    nginx -t -c /etc/nginx/http.d/nanobot.conf 2>&1 || echo "[WARNING] Nginx config test failed"
-    nginx -c /etc/nginx/http.d/nanobot.conf &
-    NGINX_PID=$!
-    sleep 1
-    if ps -p $NGINX_PID > /dev/null 2>&1; then
-        echo "[INFO] Nginx started (PID: ${NGINX_PID})"
-    else
-        echo "[ERROR] Nginx failed to start, falling back to direct mode..."
-        # Fallback: run WebUI directly on port 8099
-        export WEBUI_PORT=8099
-        export WEBUI_HOST="0.0.0.0"
-        export WEBUI_ONLY=true
-        export WEBUI_LOG_LEVEL="${LOG_LEVEL}"
-        nanobot webui start --port 8099 --host 0.0.0.0 &
-        WEBUI_PID=$!
-        echo "[INFO] WebUI fallback started (PID: ${WEBUI_PID}, port: 8099)"
-    fi
-    
+    echo "[INFO] WebUI started (PID: ${WEBUI_PID})"
+
+    # Wait briefly for the WebUI to bind
     sleep 3
 else
     echo "[INFO] NanoBot WebUI: disabled"

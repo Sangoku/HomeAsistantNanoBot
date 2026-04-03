@@ -1,5 +1,5 @@
 name: "NanoBot AI Assistant"
-version: "0.2.19"
+version: "0.2.20"
 slug: "nanobot"
 description: >-
   Ultra-lightweight personal AI assistant powered by NanoBot.
@@ -11,8 +11,7 @@ arch:
 startup: application
 boot: auto
 init: false
-ingress: true
-ingress_port: 8099
+ingress: false
 panel_icon: mdi:cat
 panel_title: "NanoBot"
 ports:
@@ -20,7 +19,7 @@ ports:
   18790/tcp: 18790
   8900/tcp: 8900
 ports_description:
-  18780/tcp: "NanoBot WebUI (direct access)"
+  18780/tcp: "NanoBot WebUI"
   18790/tcp: "NanoBot Gateway API"
   8900/tcp: "NanoBot OpenAI-compatible API (for HA Conversation integration)"
 map:

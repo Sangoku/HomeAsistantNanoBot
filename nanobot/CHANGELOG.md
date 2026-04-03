@@ -2,9 +2,9 @@
 
 ## 0.2.19
 
-- Fixed startup crash caused by WebUI static file extraction (`webui.web.__file__` is `None` in nanobot-webui v0.2.6)
-- Fixed WebUI not loading under HA ingress — absolute asset paths (`/assets/...`) rewritten to relative (`./assets/...`) so they resolve correctly under the ingress prefix
-- Improved nginx config: added Socket.IO proxy, ingress header forwarding, asset caching
+- Removed nginx reverse proxy and HA ingress — WebUI served directly on port 18780
+- Removed static file extraction and path rewriting (source of startup crashes)
+- WebUI accessible via direct port mapping (e.g. `http://<host>:18780`)
 
 ## 0.2.3
 
