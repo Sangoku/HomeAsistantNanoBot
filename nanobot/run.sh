@@ -236,11 +236,25 @@ else:
     print(f'Missing: {src}')
 "
     
-    # Verify files exist
-    ls -la /usr/share/nginx/html/ 2>&1 || echo "[ERROR] html directory empty"
-    
-    if [ ! -f "/usr/share/nginx/html/index.html" ]; then
-        echo "[ERROR] index.html not found!"
+    # Rewrite index.html: convert absolute paths to relative for HA ingress compatibility.
+    # HA ingress serves the UI under /api/hassio_ingress/<token>/ — absolute paths like
+    # /assets/index.js would resolve to the server root, bypassing the ingress prefix.
+    # Converting to ./assets/index.js makes the browser resolve relative to the current URL.
+    if [ -f "/usr/share/nginx/html/index.html" ]; then
+        echo "[INFO] Rewriting index.html paths for HA ingress..."
+        python3 -c "
+import re
+f = '/usr/share/nginx/html/index.html'
+html = open(f).read()
+# href=\"/...\" -> href=\"./...\"  and  src=\"/...\" -> src=\"./...\"
+html = re.sub(r'((?:href|src)=\")/', r'\1./', html)
+# Also fix manifest link
+html = html.replace('href=\"/manifest.webmanifest\"', 'href=\"./manifest.webmanifest\"')
+open(f, 'w').write(html)
+print('Done — paths rewritten to relative')
+"
+    else
+        echo "[ERROR] index.html not found after extraction!"
     fi
     
     # Start WebUI backend on port 18781 (nginx proxies 8099 -> 18781)
