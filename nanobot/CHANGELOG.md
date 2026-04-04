@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.21
+
+- Fixed WebUI password reset on every add-on restart: pass `--config /config/nanobot/config.json`
+  to `nanobot webui start` so that `webui_config.json` (users/passwords) is stored in the
+  persisted `/config/nanobot/` volume instead of the ephemeral `/root/.nanobot/` container path.
+
 ## 0.2.20
 
 - Added `webui` config for "Open Web UI" button on the add-on page (links to `http://<host>:18780/dashboard`)

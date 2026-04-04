@@ -213,7 +213,10 @@ fi
 # ==============================================================================
 if [ "${WEBUI_ENABLED}" = "true" ]; then
     echo "[INFO] NanoBot WebUI enabled on port 18780..."
-    nanobot webui start --port 18780 --host 0.0.0.0 --webui-only --log-level "${LOG_LEVEL}" &
+    # Pass --config so nanobot-webui stores webui_config.json (users/passwords)
+    # in /config/nanobot/ — a persisted HA volume — instead of the ephemeral
+    # /root/.nanobot/ directory which is wiped on every container restart.
+    nanobot webui start --port 18780 --host 0.0.0.0 --webui-only --log-level "${LOG_LEVEL}" --config /config/nanobot/config.json &
     WEBUI_PID=$!
     echo "[INFO] WebUI started (PID: ${WEBUI_PID})"
 
