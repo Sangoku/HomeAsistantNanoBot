@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.23
+
+- Fixed OpenAI-compatible API to accept multi-message conversations from HA voice
+  assistants (Extended OpenAI Conversation, etc.). Previously the API rejected any
+  request with more than one message, returning "Only a single user message is
+  supported". Now system instructions, conversation history, and user messages are
+  all combined and passed to the agent loop as structured context.
+
 ## 0.2.22
 
 - Fixed MCP server configs getting reset on every add-on restart: user/agent-added

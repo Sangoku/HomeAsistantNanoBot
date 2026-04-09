@@ -65,6 +65,51 @@ def _response_text(value: Any) -> str:
     return str(value)
 
 
+def _msg_text(content: Any) -> str:
+    """Extract plain text from a message content field (string or parts array)."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return " ".join(
+            part.get("text", "") for part in content
+            if isinstance(part, dict) and part.get("type") == "text"
+        )
+    return str(content) if content else ""
+
+
+def _extract_content(messages: list[dict[str, Any]]) -> str:
+    """Combine all messages into a single content string for process_direct().
+
+    If there's only one user message (simple case), return its content directly.
+    If there are multiple messages (system instructions, conversation history),
+    combine them into a structured prompt so NanoBot gets the full context.
+    """
+    # Simple case: single user message — pass through directly
+    if len(messages) == 1 and messages[0].get("role") == "user":
+        return _msg_text(messages[0].get("content", ""))
+
+    # Multi-message case: combine system context + conversation history
+    parts: list[str] = []
+
+    # System messages become context
+    for msg in messages:
+        if not isinstance(msg, dict):
+            continue
+        role = msg.get("role", "")
+        text = _msg_text(msg.get("content", ""))
+        if not text:
+            continue
+
+        if role == "system":
+            parts.append(f"[System instructions from Home Assistant]\n{text}")
+        elif role == "assistant":
+            parts.append(f"[Previous assistant response]\n{text}")
+        elif role == "user":
+            parts.append(f"[User]\n{text}")
+
+    return "\n\n".join(parts)
+
+
 # ---------------------------------------------------------------------------
 # Route handlers
 # ---------------------------------------------------------------------------
@@ -81,21 +126,21 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
         return _error_json(400, "Invalid JSON body")
 
     messages = body.get("messages")
-    if not isinstance(messages, list) or len(messages) != 1:
-        return _error_json(400, "Only a single user message is supported")
+    if not isinstance(messages, list) or len(messages) == 0:
+        return _error_json(400, "messages must be a non-empty array")
 
     if body.get("stream", False):
         return _error_json(400, "stream=true is not supported yet")
 
-    message = messages[0]
-    if not isinstance(message, dict) or message.get("role") != "user":
-        return _error_json(400, "Only a single user message is supported")
+    # Build user_content from all messages in the conversation.
+    # OpenAI-compatible clients (like HA's Extended OpenAI Conversation)
+    # send system + assistant + user messages. NanoBot's process_direct()
+    # accepts a single content string, so we combine all messages into
+    # a structured prompt that preserves the full conversation context.
+    user_content = _extract_content(messages)
 
-    user_content = message.get("content", "")
-    if isinstance(user_content, list):
-        user_content = " ".join(
-            part.get("text", "") for part in user_content if part.get("type") == "text"
-        )
+    if not user_content:
+        return _error_json(400, "No user message found in messages array")
 
     agent_loop = request.app["agent_loop"]
     timeout_s: float = request.app.get("request_timeout", 120.0)
