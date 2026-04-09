@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.24
+
+- Added `ffmpeg` to the Docker container for Discord voice message support.
+  NanoBot can now transcribe and process audio/voice messages sent in Discord channels.
+- Updated voice assistant documentation: the built-in HA "OpenAI Conversation"
+  integration no longer supports custom endpoints — docs now point users to the
+  **Extended OpenAI Conversation** HACS integration with step-by-step setup instructions.
+
 ## 0.2.23
 
 - Fixed OpenAI-compatible API to accept multi-message conversations from HA voice

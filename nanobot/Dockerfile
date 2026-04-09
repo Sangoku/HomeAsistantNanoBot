@@ -16,7 +16,8 @@ RUN apk add --no-cache \
     openssl-dev \
     cargo \
     jq \
-    bash
+    bash \
+    ffmpeg
 
 # Install nanobot-ai from PyPI with Discord + API server support
 RUN pip3 install --no-cache-dir --break-system-packages "nanobot-ai[discord]" aiohttp

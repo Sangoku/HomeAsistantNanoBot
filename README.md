@@ -97,11 +97,18 @@ Install [ha-mcp](https://github.com/homeassistant-ai/ha-mcp), copy its URL from 
 
 ### 4. Give it a voice
 
-- Enable **Enable OpenAI-Compatible API**
-- Enable **Auto-register as Conversation Agent**
+- Enable **Enable OpenAI-Compatible API** in the NanoBot add-on config
 - Restart the add-on
+- Install **[Extended OpenAI Conversation](https://github.com/jekalmin/extended_openai_conversation)** via HACS:
+  1. HACS → Integrations → ⋮ → Custom repositories → paste `https://github.com/jekalmin/extended_openai_conversation` → Category: Integration → Add
+  2. Search **"Extended OpenAI Conversation"** in HACS → Download → Restart HA
+  3. Settings → Devices & Services → Add Integration → search **"Extended OpenAI"**
+  4. Set API Key to `nanobot`, Base URL to `http://<your-ha-ip>:8900/v1`, check **Skip Authentication**
+  5. Settings → Voice Assistants → set Conversation Agent to **"NanoBot (Extended OpenAI Conversation)"**
 
-That's it. NanoBot is now your HA Assist voice assistant. No manual integration setup, no URL copying. Just talk to your home.
+That's it. Open the Assist dialog and talk to your home.
+
+> **Why not the built-in OpenAI Conversation?** Recent HA versions removed support for custom API endpoints — it only works with the official OpenAI API now. The HACS integration restores this ability.
 
 ### 5. Let it loose (optional)
 

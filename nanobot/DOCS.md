@@ -101,11 +101,38 @@ It stores notes, reminders, lists, and research results in its workspace. It rem
 
 ## Voice Assistant
 
-When API + Auto Conversation Agent are enabled, NanoBot registers itself as the conversation agent in your default HA Assist pipeline. Your voice commands go through NanoBot, which uses its full toolkit to answer and act.
+NanoBot can be your HA Assist voice assistant. You talk to it through the Assist dialog (or a physical voice satellite), and it uses its full toolkit to answer and act.
 
-**Automatic setup (recommended):** Enable the two checkboxes, restart. That's it.
+### Setup (via HACS — recommended)
 
-**Manual setup:** Add the `OpenAI Conversation` integration in HA Settings -> Devices & Services. Set API key to anything (e.g. `nanobot`) and base URL to `http://<your-ha-ip>:8900/v1`. Then set it as the conversation agent in Settings -> Voice Assistants.
+The built-in HA "OpenAI Conversation" integration no longer supports custom API endpoints. You need the **Extended OpenAI Conversation** custom integration from HACS instead.
+
+1. **Install HACS** if you don't have it: [hacs.xyz](https://hacs.xyz/)
+2. In HACS → **Integrations** → click **⋮** (top right) → **Custom repositories**
+3. Paste: `https://github.com/jekalmin/extended_openai_conversation` → Category: **Integration** → **Add**
+4. Search for **"Extended OpenAI Conversation"** in HACS → **Download** → **Restart Home Assistant**
+5. Go to **Settings → Devices & Services → Add Integration** → search **"Extended OpenAI"**
+6. Configure:
+   - **Name**: `NanoBot`
+   - **API Key**: `nanobot` (any non-empty string — NanoBot doesn't validate it)
+   - **Base URL**: `http://<your-ha-ip>:8900/v1`
+   - **Skip Authentication**: ✅ checked
+   - **Api Provider**: `OpenAI`
+7. Go to **Settings → Voice Assistants** → edit your default assistant → set **Conversation Agent** to **"NanoBot (Extended OpenAI Conversation)"**
+8. Open the **Assist** dialog and talk to your home!
+
+> **Important:** Make sure **Enable OpenAI-Compatible API** is turned on in the NanoBot add-on config before setting this up.
+
+### Full voice pipeline (optional)
+
+To use actual voice (not just text), you also need STT and TTS in your Assist pipeline:
+
+| Component | Easiest option | Free local option |
+|---|---|---|
+| **Speech-to-Text** | Home Assistant Cloud | Whisper add-on |
+| **Text-to-Speech** | Home Assistant Cloud | Piper add-on |
+| **Wake Word** | — | openWakeWord add-on |
+| **Voice Hardware** | Assist UI in browser | ESP32-S3 satellite, M5Stack Atom Echo |
 
 ---
 
