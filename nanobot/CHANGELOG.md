@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.22
+
+- Fixed MCP server configs getting reset on every add-on restart: user/agent-added
+  MCP servers in `config.json` are now preserved across restarts. Only the managed
+  `homeassistant` entry is regenerated from addon options — all other MCP servers
+  (added via WebUI, agent, or manual edits) survive container restarts.
+
 ## 0.2.21
 
 - Fixed WebUI password reset on every add-on restart: pass `--config /config/nanobot/config.json`

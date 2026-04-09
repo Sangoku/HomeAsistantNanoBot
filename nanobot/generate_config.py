@@ -91,6 +91,43 @@ HA_READ_ONLY_TOOLS = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Managed MCP server names — these are always regenerated from addon options
+# and will NOT be preserved from the existing config on restart.
+# ---------------------------------------------------------------------------
+MANAGED_MCP_SERVERS = {"homeassistant"}
+
+
+def load_existing_mcp_servers(config_path: Path) -> dict:
+    """Load user/agent-added MCP server configs from an existing config.json.
+
+    Returns a dict of server_name -> server_config for all MCP servers
+    found in the existing config, excluding managed servers (e.g. 'homeassistant')
+    which are always regenerated from HA addon options.
+    """
+    if not config_path.exists():
+        return {}
+
+    try:
+        with open(config_path) as f:
+            existing = json.load(f)
+
+        mcp_servers = existing.get("tools", {}).get("mcp_servers", {})
+
+        # Filter out managed servers — they are regenerated from addon options
+        preserved = {
+            k: v for k, v in mcp_servers.items() if k not in MANAGED_MCP_SERVERS
+        }
+
+        return preserved
+    except (json.JSONDecodeError, OSError) as e:
+        print(
+            f"WARNING: Could not read existing config at {config_path}: {e}",
+            file=sys.stderr,
+        )
+        return {}
+
+
 def env_or(env_key: str, fallback):
     """Return env var value if set and non-empty, else fallback."""
     val = os.environ.get(env_key, "").strip()
@@ -263,6 +300,19 @@ def main():
             "WARNING: ha_mcp_enabled=true but ha_mcp_url is empty. "
             "Install the ha-mcp add-on and paste its URL into ha_mcp_url.",
             file=sys.stderr,
+        )
+
+    # -------------------------------------------------------------------------
+    # Preserve user/agent-added MCP servers from previous config
+    # -------------------------------------------------------------------------
+    preserved_servers = load_existing_mcp_servers(config_path)
+    if preserved_servers:
+        config.setdefault("tools", {}).setdefault("mcp_servers", {})
+        for name, server_cfg in preserved_servers.items():
+            config["tools"]["mcp_servers"][name] = server_cfg
+        print(
+            f"  Preserved {len(preserved_servers)} user-added MCP server(s): "
+            f"{', '.join(preserved_servers.keys())}"
         )
 
     # -------------------------------------------------------------------------
