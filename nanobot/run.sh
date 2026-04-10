@@ -48,6 +48,9 @@ else
     echo "[INFO] Generating NanoBot configuration..."
 fi
 
+# Clean stale npm cache to prevent npx MCP server failures (ENOTEMPTY / missing modules)
+npm cache clean --force 2>/dev/null || true
+
 # Generate nanobot config.json from HA options
 # (set -e exits on failure automatically)
 python3 /app/generate_config.py

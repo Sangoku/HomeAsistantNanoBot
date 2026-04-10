@@ -2,7 +2,7 @@ build_from:
   amd64: ghcr.io/home-assistant/amd64-base-python:3.12-alpine3.21
   aarch64: ghcr.io/home-assistant/aarch64-base-python:3.12-alpine3.21
 args:
-  BUILD_VERSION: "0.1.4"
+  BUILD_VERSION: "0.2.25"
 labels:
   io.hass.name: "NanoBot AI Assistant"
   io.hass.description: "Ultra-lightweight personal AI assistant"

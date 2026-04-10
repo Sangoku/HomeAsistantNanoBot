@@ -4,6 +4,8 @@
 
 - Fixed API server crash (`TypeError: AgentLoop.__init__() got an unexpected keyword argument 'web_search_config'`)
   caused by nanobot-ai 0.1.5 renaming `web_search_config` + `web_proxy` parameters to a single `web_config` parameter.
+- Added npm cache cleanup on startup to prevent npx-based MCP servers (e.g. `open-websearch`)
+  from failing due to corrupted npm cache (`ENOTEMPTY` / `Cannot find module` errors).
 
 ## 0.2.24
 
