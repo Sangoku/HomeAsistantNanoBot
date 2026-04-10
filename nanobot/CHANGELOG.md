@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.25
+
+- Fixed API server crash (`TypeError: AgentLoop.__init__() got an unexpected keyword argument 'web_search_config'`)
+  caused by nanobot-ai 0.1.5 renaming `web_search_config` + `web_proxy` parameters to a single `web_config` parameter.
+
 ## 0.2.24
 
 - Added `ffmpeg` to the Docker container for Discord voice message support.

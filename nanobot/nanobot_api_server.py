@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Standalone NanoBot OpenAI-compatible API server.
 
-The `nanobot serve` CLI command is not available in nanobot-ai<=0.1.4.post6
-(it exists only in unreleased upstream source). This script provides the same
-functionality: a minimal aiohttp server exposing /v1/chat/completions,
-/v1/models, and /health.
+Provides a minimal aiohttp server exposing /v1/chat/completions,
+/v1/models, and /health — compatible with nanobot-ai >= 0.1.5.
 
 Usage:
     python3 /app/nanobot_api_server.py
@@ -295,8 +293,7 @@ def main() -> None:
         model=model_name,
         max_iterations=defaults.max_tool_iterations,
         context_window_tokens=defaults.context_window_tokens,
-        web_search_config=config.tools.web.search,
-        web_proxy=config.tools.web.proxy or None,
+        web_config=config.tools.web,
         exec_config=config.tools.exec,
         restrict_to_workspace=config.tools.restrict_to_workspace,
         session_manager=session_manager,
